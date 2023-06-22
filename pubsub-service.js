@@ -1,58 +1,9 @@
-// const { v1 } = require('@google-cloud/pubsub');
-// const {sendGrid} = require("./mailer");
-// const subClient = new v1.SubscriberClient();
-// module.exports.synchronousPull = async (projectId, subscriptionNameOrId) => {
-//   // The low level API client requires a name only.
-//   const formattedSubscription =
-//       subscriptionNameOrId.indexOf('/') >= 0
-//           ? subscriptionNameOrId
-//           : subClient.subscriptionPath(projectId, subscriptionNameOrId);
-//
-//   // The maximum number of messages returned for this request.
-//   // Pub/Sub may return fewer than the number specified.
-//   const request = {
-//     subscription: formattedSubscription,
-//     maxMessages: 100,
-//   };
-//   let i = 0;
-//
-//   // The subscriber pulls a specified number of messages.
-//   const [response] = await subClient.pull(request);
-//
-//   // Process the messages.
-//   const ackIds = [];
-//   for (const message of response.receivedMessages || []) {
-//     let val = JSON.parse(message.message.data);
-//     console.log(++i + " : " + val.to);
-//
-//     await sendGrid(val.to, val.from, val.subject, val.html);
-//
-//     if(message.ackId) {
-//       ackIds.push(message.ackId)
-//     }
-//   }
-//
-//   if (ackIds.length !== 0) {
-//     // Acknowledge all of the messages. You could also acknowledge
-//     // these individually, but this is more efficient.
-//     const ackRequest = {
-//       subscription: formattedSubscription,
-//       ackIds: ackIds,
-//     };
-//     // console.log(ackRequest)
-//
-//     await subClient.acknowledge(ackRequest);
-//   }
-// }
-
-
-
 const { v1 } = require('@google-cloud/pubsub');
 const { sendGrid } = require("./mailer");
 
 const subClient = new v1.SubscriberClient();
 
-module.exports.synchronousPull = async (projectId, subscriptionNameOrId) => {
+module.exports.synchronousPull = async (projectId, subscriptionNameOrId, productKey) => {
   const timeoutDuration = 10*60*1000; // Timeout duration in milliseconds
 
   // Wrap the entire function in a Promise
@@ -87,7 +38,7 @@ module.exports.synchronousPull = async (projectId, subscriptionNameOrId) => {
         let val = JSON.parse(message.message.data);
         console.log(++i + " : " + val.to);
 
-        // await sendGrid(val.to, val.from, val.subject, val.html);
+        await sendGrid(val.to, val.from, val.subject, val.html, productKey);
 
         if(message.ackId) {
           ackIds.push(message.ackId)

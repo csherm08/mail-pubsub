@@ -1,5 +1,6 @@
 const express = require('express')
 const { synchronousPull } = require('./pubsub-service');
+const { callGetSecret } = require('./mailer');
 const app = express();
 const port = 8080;
 const projectId = 'frese-bakery-api';
@@ -7,7 +8,8 @@ const subscriptionName = 'projects/frese-bakery-api/subscriptions/mailer';
 
 app.get('/pull-messages', async (req, res) => {
     try {
-        await synchronousPull(projectId, subscriptionName);
+        const apiKey = await callGetSecret();
+        await synchronousPull(projectId, subscriptionName, apiKey);
         res.send('Messages pulled successfully');
     } catch(error) {
         console.error('Error pulling messages:', error);

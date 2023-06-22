@@ -1,15 +1,24 @@
-module.exports.sendGrid = function(to, from, subject, html) {
+const {SecretManagerServiceClient} = require('@google-cloud/secret-manager').v1;
+const secretmanagerClient = new SecretManagerServiceClient();
+const name = `projects/frese-bakery-api/secrets/MAIL_KEY/versions/latest`;
+
+secret = null;
+module.exports.callGetSecret = async () => {
+    const [version] = await secretmanagerClient.accessSecretVersion({
+        name: name,
+    });
+
+    return version.payload.data.toString();
+}
+module.exports.sendGrid = function(to, from, subject, html, apiKey) {
     const sgMail = require('@sendgrid/mail')
-    sgMail.setApiKey('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')
+    sgMail.setApiKey(apiKey);
     const msg = {
         to, // Change to your recipient
         from, // Change to your verified sender
         subject,
         html,
     }
-    // console.log("TO ", to);
-    // console.log("FROM ", from);
-    // console.log("SUBJECT ", subject);
     sgMail
         .send(msg)
         .then(() => {
