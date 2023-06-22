@@ -1,0 +1,16 @@
+runtime: nodejs
+entrypoint: app.js
+
+instance_class: F2
+
+env: flex
+env_variables:
+  # Add any environment variables needed by your application
+  VARIABLE_NAME: value
+
+automatic_scaling:
+
+handlers:
+  - url: /pull-messages
+    script: auto
+    secure: always

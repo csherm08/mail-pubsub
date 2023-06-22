@@ -1,0 +1,5 @@
+cron:
+  - description: "Mailer"
+    url: /pull-messages
+    schedule: every 24 hours
+    target: pull-messages
